@@ -12,75 +12,86 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-primary sticky-top shadow-sm px-3">
-    <span class="navbar-brand fw-bold">💰 LendTrack</span>
-    <div class="d-flex align-items-center gap-2">
-      <span class="text-white small d-none d-sm-inline" id="userName"></span>
-      <button class="btn btn-sm btn-outline-light"
-              onclick="signOut()"
-              title="Logout"
-              aria-label="Logout">
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-      </button>
+ <nav class="app-navbar">
+  <div class="brand">💰 Lend<span>Track</span></div>
+  <div class="d-flex align-items-center gap-2">
+    <div class="user-chip d-none d-sm-flex">
+      <i class="bi bi-person-circle" aria-hidden="true"></i>
+      <span id="userName"></span>
     </div>
-  </nav>
+    <button class="btn btn-icon" onclick="signOut()" title="Logout" aria-label="Logout">
+      <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</nav>
 
   <div class="container-fluid py-3 px-3">
 
     <!-- Summary Cards -->
-    <div class="row g-2 mb-3">
-      <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm text-center p-3 bg-primary-subtle rounded-3">
-          <div class="text-muted small">Total Lent</div>
-          <div class="fs-5 fw-bold text-primary" id="totalLent">₹0</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm text-center p-3 bg-success-subtle rounded-3">
-          <div class="text-muted small">Recovered</div>
-          <div class="fs-5 fw-bold text-success" id="totalRepaid">₹0</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm text-center p-3 bg-danger-subtle rounded-3">
-          <div class="text-muted small">Outstanding</div>
-          <div class="fs-5 fw-bold text-danger" id="outstanding">₹0</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm text-center p-3 bg-warning-subtle rounded-3">
-          <div class="text-muted small">Borrowers</div>
-          <div class="fs-5 fw-bold text-warning" id="totalBorrowers">0</div>
-        </div>
+  <div class="row g-2 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="bi bi-arrow-up-circle" aria-hidden="true"></i></div>
+      <div>
+        <div class="stat-label">Total Lent</div>
+        <div class="stat-value" id="totalLent">₹0</div>
       </div>
     </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="bi bi-arrow-down-circle" aria-hidden="true"></i></div>
+      <div>
+        <div class="stat-label">Recovered</div>
+        <div class="stat-value" id="totalRepaid">₹0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon red"><i class="bi bi-exclamation-circle" aria-hidden="true"></i></div>
+      <div>
+        <div class="stat-label">Outstanding</div>
+        <div class="stat-value" id="outstanding">₹0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon yellow"><i class="bi bi-people" aria-hidden="true"></i></div>
+      <div>
+        <div class="stat-label">Borrowers</div>
+        <div class="stat-value" id="totalBorrowers">0</div>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Toolbar -->
-    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
-      <input
-        type="text"
-        id="searchInput"
-        class="form-control flex-grow-1"
-        placeholder="🔍 Search by name..."
-        aria-label="Search borrowers by name"
-        title="Search borrowers by name">
-      <select
-        class="form-select w-auto"
-        aria-label="Filter borrowers by status"
-        title="Filter borrowers by status"
-        onchange="renderBorrowers(this.value)">
-        <option value="all">All</option>
-        <option value="pending">Pending</option>
-        <option value="settled">Settled</option>
-      </select>
-      <button
-        class="btn btn-primary"
-        onclick="openAddBorrowerModal()"
-        aria-label="Add new borrower"
-        title="Add new borrower">
-        <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Add
-      </button>
-    </div>
+    <div class="toolbar mb-3">
+  <input
+    type="text"
+    id="searchInput"
+    class="form-control flex-grow-1"
+    placeholder="Search by name..."
+    aria-label="Search borrowers by name"
+    title="Search borrowers by name">
+  <select
+    class="form-select w-auto"
+    aria-label="Filter borrowers by status"
+    title="Filter borrowers by status"
+    onchange="renderBorrowers(this.value)">
+    <option value="all">All</option>
+    <option value="pending">Pending</option>
+    <option value="settled">Settled</option>
+  </select>
+  <button class="btn btn-primary" onclick="openAddBorrowerModal()" aria-label="Add new borrower">
+    <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Add
+  </button>
+  <button class="btn btn-outline-secondary" onclick="exportAllToPDF()" aria-label="Export to PDF">
+    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> PDF
+  </button>
+</div>
 
     <!-- Borrowers Grid -->
     <div class="row" id="borrowerList">
@@ -275,6 +286,9 @@
   </div>
 
   <!-- Firebase + Bootstrap JS -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>

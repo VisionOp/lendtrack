@@ -1,28 +1,423 @@
-* { font-family: 'Inter', sans-serif; }
+/* ── Base ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-body { background-color: #f4f6fb; }
+:root {
+  --primary:      #4361ee;
+  --primary-soft: #eef0fd;
+  --success:      #2dc653;
+  --success-soft: #edfbf1;
+  --danger:       #ef233c;
+  --danger-soft:  #fef0f2;
+  --warning:      #f4a522;
+  --warning-soft: #fef6e9;
+  --text-main:    #1a1a2e;
+  --text-muted:   #8b8fa8;
+  --border:       #eaecf4;
+  --bg:           #f5f6fa;
+  --white:        #ffffff;
+  --radius:       14px;
+  --radius-sm:    8px;
+  --shadow:       0 2px 12px rgba(67,97,238,0.07);
+  --shadow-hover: 0 8px 28px rgba(67,97,238,0.13);
+}
 
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+/* ── Auth Page ─────────────────────────────────────────────── */
 .auth-body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.auth-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.2rem 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-logo {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.auth-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.auth-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+.app-navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-navbar .brand {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.app-navbar .brand span {
+  color: var(--text-main);
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Summary Cards ──────────────────────────────────────────── */
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  box-shadow: var(--shadow);
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-icon.blue   { background: var(--primary-soft); color: var(--primary); }
+.stat-icon.green  { background: var(--success-soft); color: var(--success); }
+.stat-icon.red    { background: var(--danger-soft);  color: var(--danger);  }
+.stat-icon.yellow { background: var(--warning-soft); color: var(--warning); }
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar .form-control,
+.toolbar .form-select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  background: var(--white);
+  color: var(--text-main);
+  box-shadow: none;
+}
+
+.toolbar .form-control:focus,
+.toolbar .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+}
+
+/* ── Borrower Cards ─────────────────────────────────────────── */
 .borrower-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border-radius: 14px !important;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  box-shadow: var(--shadow);
+  height: 100%;
 }
+
 .borrower-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+  box-shadow: var(--shadow-hover);
+  border-color: #c5cdfa;
+  transform: translateY(-3px);
 }
 
-.card { border-radius: 12px; }
-.modal-content { border: none; }
+.borrower-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-.navbar { padding: 0.6rem 1rem; }
+.borrower-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0;
+}
 
-/* Mobile tweaks */
+.borrower-phone {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.3rem;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.stat-row-item {
+  text-align: center;
+}
+
+.stat-row-item .mini-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-row-item .mini-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.card-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  gap: 0.4rem;
+}
+
+/* ── Status Badges ──────────────────────────────────────────── */
+.badge-status {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.28rem 0.65rem;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.badge-pending  { background: var(--warning-soft); color: var(--warning); }
+.badge-partial  { background: #fff3e0;              color: #e65100; }
+.badge-settled  { background: var(--success-soft);  color: var(--success); }
+.badge-overdue  { background: var(--danger-soft);   color: var(--danger);  }
+
+/* ── Empty State ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1rem;
+  color: var(--text-muted);
+}
+
+.empty-icon { font-size: 2.8rem; margin-bottom: 0.5rem; }
+.empty-text { font-size: 0.85rem; }
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 1rem;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background: #3451d1;
+  border-color: #3451d1;
+  box-shadow: 0 4px 14px rgba(67,97,238,0.3);
+}
+
+.btn-outline-secondary {
+  border-color: var(--border);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-icon:hover { background: var(--white); color: var(--danger); border-color: var(--danger-soft); }
+.btn-icon.add:hover { color: var(--primary); border-color: var(--primary-soft); }
+
+/* ── Modals ─────────────────────────────────────────────────── */
+.modal-content {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  padding: 1.2rem 1.4rem 0.6rem;
+  border-bottom: none;
+}
+
+.modal-body   { padding: 0.5rem 1.4rem 1rem; }
+.modal-footer { padding: 0 1.4rem 1.2rem; border-top: none; }
+
+.modal-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.3rem;
+}
+
+.form-control, .form-select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-main);
+  padding: 0.5rem 0.8rem;
+  box-shadow: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+  outline: none;
+}
+
+.modal-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.6rem 0 1rem;
+}
+
+/* ── Loan History Cards ─────────────────────────────────────── */
+.loan-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.loan-item-amount { font-size: 1rem; font-weight: 700; color: var(--text-main); }
+.loan-item-meta   { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+.loan-item-due    { font-size: 0.72rem; margin-top: 0.2rem; }
+
+.repay-mini-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ── Outstanding Info Alert ─────────────────────────────────── */
+.outstanding-info {
+  background: var(--primary-soft);
+  border: 1px solid #c5cdfa;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ── Accessibility ──────────────────────────────────────────── */
+.btn-close:focus  { outline: 2px solid var(--primary); outline-offset: 2px; }
+.visually-hidden  { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ── Mobile ─────────────────────────────────────────────────── */
 @media (max-width: 576px) {
-  .fs-5 { font-size: 1rem !important; }
-  .card-body { padding: 0.85rem; }
+  .stat-value    { font-size: 1rem; }
+  .auth-card     { padding: 1.6rem 1.2rem; margin: 1rem; }
+  .modal-header  { padding: 1rem 1.1rem 0.5rem; }
+  .modal-body    { padding: 0.4rem 1.1rem 0.8rem; }
+  .modal-footer  { padding: 0 1.1rem 1rem; }
 }
