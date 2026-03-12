@@ -1,0 +1,28 @@
+* { font-family: 'Inter', sans-serif; }
+
+body { background-color: #f4f6fb; }
+
+.auth-body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.borrower-card {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 14px !important;
+}
+.borrower-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+}
+
+.card { border-radius: 12px; }
+.modal-content { border: none; }
+
+.navbar { padding: 0.6rem 1rem; }
+
+/* Mobile tweaks */
+@media (max-width: 576px) {
+  .fs-5 { font-size: 1rem !important; }
+  .card-body { padding: 0.85rem; }
+}

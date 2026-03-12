@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LendTrack – Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark bg-primary sticky-top shadow-sm px-3">
+    <span class="navbar-brand fw-bold">💰 LendTrack</span>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-white small d-none d-sm-inline" id="userName"></span>
+      <button class="btn btn-sm btn-outline-light"
+              onclick="signOut()"
+              title="Logout"
+              aria-label="Logout">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-3 px-3">
+
+    <!-- Summary Cards -->
+    <div class="row g-2 mb-3">
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center p-3 bg-primary-subtle rounded-3">
+          <div class="text-muted small">Total Lent</div>
+          <div class="fs-5 fw-bold text-primary" id="totalLent">₹0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center p-3 bg-success-subtle rounded-3">
+          <div class="text-muted small">Recovered</div>
+          <div class="fs-5 fw-bold text-success" id="totalRepaid">₹0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center p-3 bg-danger-subtle rounded-3">
+          <div class="text-muted small">Outstanding</div>
+          <div class="fs-5 fw-bold text-danger" id="outstanding">₹0</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center p-3 bg-warning-subtle rounded-3">
+          <div class="text-muted small">Borrowers</div>
+          <div class="fs-5 fw-bold text-warning" id="totalBorrowers">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control flex-grow-1"
+        placeholder="🔍 Search by name..."
+        aria-label="Search borrowers by name"
+        title="Search borrowers by name">
+      <select
+        class="form-select w-auto"
+        aria-label="Filter borrowers by status"
+        title="Filter borrowers by status"
+        onchange="renderBorrowers(this.value)">
+        <option value="all">All</option>
+        <option value="pending">Pending</option>
+        <option value="settled">Settled</option>
+      </select>
+      <button
+        class="btn btn-primary"
+        onclick="openAddBorrowerModal()"
+        aria-label="Add new borrower"
+        title="Add new borrower">
+        <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Add
+      </button>
+    </div>
+
+    <!-- Borrowers Grid -->
+    <div class="row" id="borrowerList">
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading your data...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ MODALS ═══════════════ -->
+
+  <!-- Add Borrower -->
+  <div class="modal fade" id="addBorrowerModal" tabindex="-1" aria-labelledby="addBorrowerModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="addBorrowerModalTitle">➕ Add Borrower</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="borrowerName" class="form-label small fw-semibold">Name *</label>
+            <input
+              type="text"
+              id="borrowerName"
+              class="form-control"
+              placeholder="e.g. Rahul Sharma"
+              aria-label="Borrower name"
+              aria-required="true">
+          </div>
+          <div class="mb-3">
+            <label for="borrowerPhone" class="form-label small fw-semibold">Phone</label>
+            <input
+              type="tel"
+              id="borrowerPhone"
+              class="form-control"
+              placeholder="e.g. 9876543210"
+              aria-label="Borrower phone number">
+          </div>
+          <div class="mb-3">
+            <label for="borrowerNote" class="form-label small fw-semibold">Note (optional)</label>
+            <input
+              type="text"
+              id="borrowerNote"
+              class="form-control"
+              placeholder="e.g. Friend, Colleague"
+              aria-label="Note about borrower">
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-primary w-100" onclick="handleAddBorrower()" aria-label="Save borrower">
+            Add Borrower
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Loan -->
+  <div class="modal fade" id="addLoanModal" tabindex="-1" aria-labelledby="addLoanModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="addLoanModalTitle">
+            💸 Loan for <span id="loanBorrowerLabel" class="text-primary"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="loanBorrowerId">
+          <div class="mb-3">
+            <label for="loanAmount" class="form-label small fw-semibold">Amount (₹) *</label>
+            <input
+              type="number"
+              id="loanAmount"
+              class="form-control"
+              placeholder="e.g. 5000"
+              aria-label="Loan amount in rupees"
+              aria-required="true"
+              min="1">
+          </div>
+          <div class="mb-3">
+            <label for="loanDate" class="form-label small fw-semibold">Date *</label>
+            <input
+              type="date"
+              id="loanDate"
+              class="form-control"
+              aria-label="Loan date"
+              aria-required="true">
+          </div>
+          <div class="mb-3">
+            <label for="loanReason" class="form-label small fw-semibold">Reason</label>
+            <input
+              type="text"
+              id="loanReason"
+              class="form-control"
+              placeholder="e.g. Medical, Travel, Business"
+              aria-label="Reason for loan">
+          </div>
+          <div class="mb-3">
+            <label for="loanDueDate" class="form-label small fw-semibold">Due Date (optional)</label>
+            <input
+              type="date"
+              id="loanDueDate"
+              class="form-control"
+              aria-label="Loan due date">
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-primary w-100" onclick="handleAddLoan()" aria-label="Save loan entry">
+            Add Loan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Borrower -->
+  <div class="modal fade" id="viewBorrowerModal" tabindex="-1" aria-labelledby="viewBorrowerName" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0 pb-0">
+          <div>
+            <h5 class="modal-title fw-bold" id="viewBorrowerName"></h5>
+            <small class="text-muted">📞 <span id="viewBorrowerPhone"></span></small>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small mb-3">📝 <span id="viewBorrowerNote"></span></p>
+          <h6 class="fw-bold mb-2 border-bottom pb-2">Loan History</h6>
+          <div id="loansList" role="list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Repayment -->
+  <div class="modal fade" id="addRepaymentModal" tabindex="-1" aria-labelledby="addRepaymentModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="addRepaymentModalTitle">💵 Add Repayment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="repaymentLoanId">
+          <div class="alert alert-info small py-2" role="status">
+            Outstanding Amount: <strong id="repaymentMax"></strong>
+          </div>
+          <div class="mb-3">
+            <label for="repaymentAmount" class="form-label small fw-semibold">Amount Received (₹) *</label>
+            <input
+              type="number"
+              id="repaymentAmount"
+              class="form-control"
+              placeholder="Enter amount"
+              aria-label="Repayment amount in rupees"
+              aria-required="true"
+              min="1">
+          </div>
+          <div class="mb-3">
+            <label for="repaymentDate" class="form-label small fw-semibold">Date *</label>
+            <input
+              type="date"
+              id="repaymentDate"
+              class="form-control"
+              aria-label="Repayment date"
+              aria-required="true">
+          </div>
+          <div class="mb-3">
+            <label for="repaymentNote" class="form-label small fw-semibold">Note</label>
+            <input
+              type="text"
+              id="repaymentNote"
+              class="form-control"
+              placeholder="e.g. UPI, Cash"
+              aria-label="Repayment note">
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-success w-100" onclick="handleAddRepayment()" aria-label="Save repayment">
+            Save Repayment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Bootstrap JS -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function openAddBorrowerModal() {
+      ['borrowerName','borrowerPhone','borrowerNote'].forEach(id => document.getElementById(id).value = '');
+      new bootstrap.Modal(document.getElementById('addBorrowerModal')).show();
+    }
+
+    function handleAddBorrower() {
+      const name = document.getElementById('borrowerName').value.trim();
+      if (!name) { alert('Name is required!'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('addBorrowerModal')).hide();
+      addBorrower(
+        name,
+        document.getElementById('borrowerPhone').value.trim(),
+        document.getElementById('borrowerNote').value.trim()
+      );
+    }
+
+    function handleAddLoan() {
+      const amount = document.getElementById('loanAmount').value;
+      const date   = document.getElementById('loanDate').value;
+      if (!amount || !date) { alert('Amount and date are required!'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('addLoanModal')).hide();
+      addLoan(
+        document.getElementById('loanBorrowerId').value,
+        amount, date,
+        document.getElementById('loanReason').value.trim(),
+        document.getElementById('loanDueDate').value
+      );
+    }
+
+    function handleAddRepayment() {
+      const amount = document.getElementById('repaymentAmount').value;
+      const date   = document.getElementById('repaymentDate').value;
+      if (!amount || !date) { alert('Amount and date are required!'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('addRepaymentModal')).hide();
+      addRepayment(
+        document.getElementById('repaymentLoanId').value,
+        amount, date,
+        document.getElementById('repaymentNote').value.trim()
+      );
+    }
+  </script>
+</body>
+</html>
