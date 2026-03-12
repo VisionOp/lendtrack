@@ -13,64 +13,62 @@
 
   <div class="col-11 col-sm-8 col-md-5 col-lg-4">
     <div class="card shadow-lg border-0 rounded-4">
-      <div class="card-body p-4">
+      <div class="auth-card">
+  <div class="text-center mb-4">
+    <div class="auth-logo">💰</div>
+    <div class="auth-title mt-2">LendTrack</div>
+    <div class="auth-subtitle">Track money you've lent to people</div>
+  </div>
 
-        <div class="text-center mb-4">
-          <div class="empty-icon">🤝</div>
-          <h4 class="fw-bold mb-0">LendTrack</h4>
-          <p class="text-muted small">Track money you've lent to people</p>
-        </div>
+  <ul class="nav nav-pills nav-fill mb-3" id="authTabs">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" onclick="showTab('login'); return false;">Login</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" onclick="showTab('signup'); return false;">Sign Up</a>
+    </li>
+  </ul>
 
-        <!-- Auth Tabs -->
-        <ul class="nav nav-pills nav-fill mb-3" id="authTabs">
-          <li class="nav-item">
-            <a class="nav-link active" href="#" onclick="showTab('login'); return false;">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="showTab('signup'); return false;">Sign Up</a>
-          </li>
-        </ul>
+  <div id="authError" class="alert alert-danger d-none small py-2 mb-3" role="alert"></div>
 
-        <div id="authError" class="alert alert-danger d-none small py-2 mb-3"></div>
+  <!-- Login Form -->
+  <div id="loginForm">
+    <div class="mb-3">
+      <input type="email" id="loginEmail" class="form-control" placeholder="Email address" aria-label="Email address">
+    </div>
+    <div class="mb-3">
+      <input type="password" id="loginPassword" class="form-control" placeholder="Password" aria-label="Password"
+        onkeydown="if(event.key==='Enter') handleLogin()">
+    </div>
+    <button class="btn btn-primary w-100 mb-3" onclick="handleLogin()">
+      <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Login
+    </button>
+  </div>
 
-        <!-- Login Form -->
-        <div id="loginForm">
-          <div class="mb-3">
-            <input type="email" id="loginEmail" class="form-control" placeholder="Email address">
-          </div>
-          <div class="mb-3">
-            <input type="password" id="loginPassword" class="form-control" placeholder="Password"
-              onkeydown="if(event.key==='Enter') handleLogin()">
-          </div>
-          <button class="btn btn-primary w-100 mb-3" onclick="handleLogin()">
-            <i class="bi bi-box-arrow-in-right"></i> Login
-          </button>
-        </div>
+  <!-- Signup Form -->
+  <div id="signupForm" class="d-none">
+    <div class="mb-3">
+      <input type="text" id="signupName" class="form-control" placeholder="Your name" aria-label="Your name">
+    </div>
+    <div class="mb-3">
+      <input type="email" id="signupEmail" class="form-control" placeholder="Email address" aria-label="Email address">
+    </div>
+    <div class="mb-3">
+      <input type="password" id="signupPassword" class="form-control" placeholder="Password (min 6 chars)" aria-label="Password">
+    </div>
+    <button class="btn btn-primary w-100 mb-3" onclick="handleSignup()">
+      <i class="bi bi-person-plus" aria-hidden="true"></i> Create Account
+    </button>
+  </div>
 
-        <!-- Signup Form -->
-        <div id="signupForm" class="d-none">
-          <div class="mb-3">
-            <input type="text" id="signupName" class="form-control" placeholder="Your name">
-          </div>
-          <div class="mb-3">
-            <input type="email" id="signupEmail" class="form-control" placeholder="Email address">
-          </div>
-          <div class="mb-3">
-            <input type="password" id="signupPassword" class="form-control" placeholder="Password (min 6 chars)">
-          </div>
-          <button class="btn btn-primary w-100 mb-3" onclick="handleSignup()">
-            <i class="bi bi-person-plus"></i> Create Account
-          </button>
-        </div>
+  <div class="text-center mb-3" style="font-size:0.75rem;color:var(--text-muted)">— or continue with —</div>
 
-        <div class="text-center text-muted small my-2">— or —</div>
+  <button class="btn btn-outline-secondary w-100" onclick="signInWithGoogle()" aria-label="Continue with Google">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" class="me-2" alt="Google">
+    Continue with Google
+  </button>
+</div>
 
-        <button class="btn btn-outline-dark w-100" onclick="signInWithGoogle()">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" class="me-2" alt="Google">
-          Continue with Google
-        </button>
-
-      </div>
     </div>
   </div>
 

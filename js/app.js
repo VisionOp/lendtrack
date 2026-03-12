@@ -95,9 +95,11 @@ function renderBorrowers(filter = 'all') {
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="col-12 text-center text-muted py-5">
-        <div style="font-size:3rem">🤝</div>
-        <p class="mt-2">No borrowers yet. Hit <strong>Add</strong> to get started!</p>
+      <div class="col-12">
+        <div class="empty-state">
+          <div class="empty-icon">🤝</div>
+          <p class="empty-text mt-2">No borrowers yet.<br>Hit <strong>Add</strong> to get started!</p>
+        </div>
       </div>`;
     return;
   }
@@ -112,44 +114,51 @@ function renderBorrowers(filter = 'all') {
     if (filter === 'pending' && outstanding === 0) return;
     if (filter === 'settled' && outstanding > 0)   return;
 
-    const badgeClass = outstanding === 0 ? 'success' : isOverdue ? 'danger' : 'warning';
+    const badgeClass = outstanding === 0 ? 'settled' : isOverdue ? 'overdue' : 'pending';
     const badgeText  = outstanding === 0 ? 'Settled'  : isOverdue ? 'Overdue' : 'Pending';
+    const initial    = b.name.charAt(0).toUpperCase();
 
     container.innerHTML += `
       <div class="col-md-6 col-lg-4 mb-3">
-        <div class="card borrower-card h-100 shadow-sm" onclick="viewBorrower('${b.id}')">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="borrower-card" onclick="viewBorrower('${b.id}')">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex gap-2 align-items-center">
+              <div class="borrower-avatar">${initial}</div>
               <div>
-                <h6 class="fw-bold mb-0">${b.name}</h6>
-                <small class="text-muted">${b.phone || 'No phone'}</small>
-              </div>
-              <span class="badge bg-${badgeClass}">${badgeText}</span>
-            </div>
-            <div class="row text-center mt-3">
-              <div class="col-4">
-                <div class="small text-muted">Lent</div>
-                <div class="fw-bold text-primary">₹${totalLent.toLocaleString('en-IN')}</div>
-              </div>
-              <div class="col-4">
-                <div class="small text-muted">Repaid</div>
-                <div class="fw-bold text-success">₹${totalRepaid.toLocaleString('en-IN')}</div>
-              </div>
-              <div class="col-4">
-                <div class="small text-muted">Due</div>
-                <div class="fw-bold text-danger">₹${outstanding.toLocaleString('en-IN')}</div>
+                <div class="borrower-name">${b.name}</div>
+                <div class="borrower-phone">${b.phone || 'No phone'}</div>
               </div>
             </div>
-            ${b.note ? `<p class="small text-muted mt-2 mb-0">📝 ${b.note}</p>` : ''}
+            <span class="badge-status badge-${badgeClass}">${badgeText}</span>
           </div>
-          <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-            <button class="btn btn-sm btn-outline-primary"
-              onclick="event.stopPropagation(); openAddLoanModal('${b.id}')">
-              <i class="bi bi-plus-circle"></i> Loan
+
+          ${b.note ? `<div class="mt-2" style="font-size:0.75rem;color:var(--text-muted)">📝 ${b.note}</div>` : ''}
+
+          <div class="stat-row">
+            <div class="stat-row-item">
+              <div class="mini-label">Lent</div>
+              <div class="mini-value" style="color:var(--primary)">₹${totalLent.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="stat-row-item">
+              <div class="mini-label">Repaid</div>
+              <div class="mini-value" style="color:var(--success)">₹${totalRepaid.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="stat-row-item">
+              <div class="mini-label">Due</div>
+              <div class="mini-value" style="color:var(--danger)">₹${outstanding.toLocaleString('en-IN')}</div>
+            </div>
+          </div>
+
+          <div class="card-footer-row">
+            <button class="btn btn-primary btn-sm add"
+              onclick="event.stopPropagation(); openAddLoanModal('${b.id}')"
+              aria-label="Add loan for ${b.name}">
+              <i class="bi bi-plus-circle" aria-hidden="true"></i> Loan
             </button>
-            <button class="btn btn-sm btn-outline-danger"
-              onclick="event.stopPropagation(); deleteBorrower('${b.id}')">
-              <i class="bi bi-trash"></i>
+            <button class="btn-icon"
+              onclick="event.stopPropagation(); deleteBorrower('${b.id}')"
+              aria-label="Delete ${b.name}">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -184,32 +193,36 @@ function viewBorrower(borrowerId) {
     loansList.innerHTML = '<p class="text-muted text-center py-3">No loans yet.</p>';
   } else {
     bLoans.forEach(loan => {
-      const outstanding = loan.amount - (loan.totalRepaid || 0);
-      const isOverdue   = loan.dueDate && new Date(loan.dueDate) < new Date() && loan.status !== 'settled';
-      const color       = loan.status === 'settled' ? 'success' : isOverdue ? 'danger' : loan.status === 'partial' ? 'warning' : 'secondary';
-      loansList.innerHTML += `
-        <div class="card mb-2 border-start border-${color} border-3">
-          <div class="card-body p-3">
-            <div class="d-flex justify-content-between">
-              <div>
-                <div class="fw-bold fs-6">₹${loan.amount.toLocaleString('en-IN')}</div>
-                <div class="small text-muted">${loan.reason || 'No reason'} · ${loan.date}</div>
-                ${loan.dueDate ? `<div class="small ${isOverdue ? 'text-danger fw-bold' : 'text-muted'}">📅 Due: ${loan.dueDate}</div>` : ''}
-              </div>
-              <div class="text-end">
-                <span class="badge bg-${color} d-block mb-1">${loan.status.charAt(0).toUpperCase() + loan.status.slice(1)}</span>
-                <div class="small text-muted">Repaid: ₹${(loan.totalRepaid || 0).toLocaleString('en-IN')}</div>
-                <div class="small text-danger">Left: ₹${outstanding.toLocaleString('en-IN')}</div>
-              </div>
-            </div>
-            ${loan.status !== 'settled' ? `
-            <button class="btn btn-sm btn-outline-success mt-2 w-100"
-              onclick="openRepaymentModal('${loan.id}', ${loan.amount}, ${loan.totalRepaid || 0})">
-              💵 Add Repayment
-            </button>` : `<div class="text-center text-success small mt-2">✅ Fully Settled</div>`}
-          </div>
-        </div>`;
-    });
+  const outstanding = loan.amount - (loan.totalRepaid || 0);
+  const isOverdue   = loan.dueDate && new Date(loan.dueDate) < new Date() && loan.status !== 'settled';
+  const badgeClass  = loan.status === 'settled' ? 'settled' : isOverdue ? 'overdue' : loan.status === 'partial' ? 'partial' : 'pending';
+  const badgeText   = isOverdue ? 'Overdue' : loan.status.charAt(0).toUpperCase() + loan.status.slice(1);
+
+  loansList.innerHTML += `
+    <div class="loan-item">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="loan-item-amount">₹${loan.amount.toLocaleString('en-IN')}</div>
+          <div class="loan-item-meta">${loan.reason || 'No reason'} · ${loan.date}</div>
+          ${loan.dueDate ? `<div class="loan-item-due ${isOverdue ? 'text-danger fw-semibold' : ''}" style="color:var(--text-muted)">📅 Due: ${loan.dueDate}</div>` : ''}
+        </div>
+        <span class="badge-status badge-${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="repay-mini-row">
+        <span>Repaid: <strong style="color:var(--success)">₹${(loan.totalRepaid || 0).toLocaleString('en-IN')}</strong></span>
+        <span>Left: <strong style="color:var(--danger)">₹${outstanding.toLocaleString('en-IN')}</strong></span>
+      </div>
+      ${loan.status !== 'settled' ? `
+      <button class="btn btn-primary btn-sm w-100 mt-2"
+        onclick="openRepaymentModal('${loan.id}', ${loan.amount}, ${loan.totalRepaid || 0})"
+        aria-label="Add repayment for this loan">
+        <i class="bi bi-cash-coin" aria-hidden="true"></i> Add Repayment
+      </button>` : `
+      <div class="text-center mt-2" style="font-size:0.75rem;color:var(--success);font-weight:600">
+        ✓ Fully Settled
+      </div>`}
+    </div>`;
+});
   }
 
   new bootstrap.Modal(document.getElementById('viewBorrowerModal')).show();
@@ -246,3 +259,173 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// ── Export All Loans to PDF ─────────────────────────────────
+function exportAllToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const pageW     = doc.internal.pageSize.getWidth();
+  const today     = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  const userName  = document.getElementById('userName').textContent || 'User';
+
+  // ── Header ────────────────────────────────────────────────
+  doc.setFillColor(13, 110, 253);
+  doc.rect(0, 0, pageW, 22, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('💰 LendTrack — Loan Report', 14, 10);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated: ${today}   |   Account: ${userName}`, 14, 17);
+
+  // ── Summary Box ───────────────────────────────────────────
+  const allLoans    = Object.values(loans);
+  const totalLent   = allLoans.reduce((s, l) => s + l.amount, 0);
+  const totalRepaid = allLoans.reduce((s, l) => s + (l.totalRepaid || 0), 0);
+  const outstanding = totalLent - totalRepaid;
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+
+  doc.setFillColor(240, 245, 255);
+  doc.roundedRect(14, 26, pageW - 28, 16, 3, 3, 'F');
+
+  doc.setTextColor(13, 110, 253);
+  doc.text(`Total Lent: Rs.${totalLent.toLocaleString('en-IN')}`, 20, 33);
+  doc.setTextColor(25, 135, 84);
+  doc.text(`Recovered: Rs.${totalRepaid.toLocaleString('en-IN')}`, 85, 33);
+  doc.setTextColor(220, 53, 69);
+  doc.text(`Outstanding: Rs.${outstanding.toLocaleString('en-IN')}`, 150, 33);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(8);
+  doc.text(`Total Borrowers: ${Object.keys(borrowers).length}`, 20, 39);
+
+  // ── Per Borrower Tables ───────────────────────────────────
+  let startY = 48;
+
+  const borrowerList = Object.values(borrowers);
+
+  if (borrowerList.length === 0) {
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('No borrowers found.', pageW / 2, 80, { align: 'center' });
+    doc.save(`LendTrack_Report_${today.replace(/ /g,'_')}.pdf`);
+    return;
+  }
+
+  borrowerList.forEach((b, index) => {
+    const bLoans      = Object.values(loans).filter(l => l.borrowerId === b.id);
+    const bTotalLent  = bLoans.reduce((s, l) => s + l.amount, 0);
+    const bRepaid     = bLoans.reduce((s, l) => s + (l.totalRepaid || 0), 0);
+    const bOutstanding = bTotalLent - bRepaid;
+
+    // Borrower name header row
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(13, 110, 253);
+    doc.text(`${index + 1}. ${b.name}`, 14, startY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    const meta = [b.phone ? `📞 ${b.phone}` : '', b.note ? `📝 ${b.note}` : ''].filter(Boolean).join('   ');
+    if (meta) doc.text(meta, 14, startY + 5);
+
+    const tableStartY = meta ? startY + 8 : startY + 4;
+
+    if (bLoans.length === 0) {
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('No loans recorded.', 18, tableStartY + 4);
+      startY = tableStartY + 10;
+    } else {
+      // Build table rows
+      const rows = bLoans.map(loan => {
+        const left = loan.amount - (loan.totalRepaid || 0);
+        const isOverdue = loan.dueDate && new Date(loan.dueDate) < new Date() && loan.status !== 'settled';
+        return [
+          loan.date || '—',
+          loan.reason || '—',
+          `Rs.${loan.amount.toLocaleString('en-IN')}`,
+          `Rs.${(loan.totalRepaid || 0).toLocaleString('en-IN')}`,
+          `Rs.${left.toLocaleString('en-IN')}`,
+          loan.dueDate || '—',
+          isOverdue ? 'Overdue' : loan.status.charAt(0).toUpperCase() + loan.status.slice(1)
+        ];
+      });
+
+      // Summary footer row
+      rows.push([
+        { content: 'TOTAL', styles: { fontStyle: 'bold' } },
+        '',
+        { content: `Rs.${bTotalLent.toLocaleString('en-IN')}`,    styles: { fontStyle: 'bold', textColor: [13,110,253] } },
+        { content: `Rs.${bRepaid.toLocaleString('en-IN')}`,       styles: { fontStyle: 'bold', textColor: [25,135,84] } },
+        { content: `Rs.${bOutstanding.toLocaleString('en-IN')}`,  styles: { fontStyle: 'bold', textColor: [220,53,69] } },
+        '', ''
+      ]);
+
+      doc.autoTable({
+        head: [['Date', 'Reason', 'Amount', 'Repaid', 'Outstanding', 'Due Date', 'Status']],
+        body: rows,
+        startY: tableStartY,
+        margin: { left: 14, right: 14 },
+        theme: 'grid',
+        styles: {
+          fontSize: 7.5,
+          cellPadding: 2.5,
+          overflow: 'linebreak',
+          font: 'helvetica'
+        },
+        headStyles: {
+          fillColor: [13, 110, 253],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 7.5
+        },
+        columnStyles: {
+          0: { cellWidth: 20 },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 25 },
+          4: { cellWidth: 28 },
+          5: { cellWidth: 22 },
+          6: { cellWidth: 22 }
+        },
+        didParseCell: function (data) {
+          if (data.column.index === 6 && data.section === 'body' && data.row.index < rows.length - 1) {
+            const status = data.cell.raw;
+            if (status === 'Settled')      data.cell.styles.textColor = [25, 135, 84];
+            else if (status === 'Overdue') data.cell.styles.textColor = [220, 53, 69];
+            else if (status === 'Partial') data.cell.styles.textColor = [255, 153, 0];
+            else                           data.cell.styles.textColor = [100, 100, 100];
+          }
+        },
+        didDrawPage: function (data) {
+          startY = data.cursor.y;
+        }
+      });
+
+      startY = doc.lastAutoTable.finalY + 8;
+    }
+
+    // Add a new page if running low on space
+    if (startY > 260 && index < borrowerList.length - 1) {
+      doc.addPage();
+      startY = 15;
+    }
+  });
+
+  // ── Footer on each page ───────────────────────────────────
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`LendTrack  |  Page ${i} of ${totalPages}  |  ${today}`, pageW / 2, 292, { align: 'center' });
+  }
+
+  doc.save(`LendTrack_Report_${today.replace(/ /g, '_')}.pdf`);
+}
